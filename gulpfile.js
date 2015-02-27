@@ -2,13 +2,9 @@
 
 
 var gulp =require('gulp'),
+  config =require('./config.json'),
   sass =require('gulp-ruby-sass'),
-  autoprefixer =require('gulp-autoprefixer'),
-  csscomb =require('gulp-csscomb'),
-  minifyCSS =require('gulp-minify-css'),
   rename =require('gulp-rename'),
-  bless =require('gulp-bless'),
-  gcmq =require('gulp-group-css-media-queries'),
   plumber =require('gulp-plumber'),
   jshint =require('gulp-jshint'),
   concat =require('gulp-concat'),
@@ -19,95 +15,73 @@ var gulp =require('gulp'),
   shell =require('gulp-shell');
 
 
-var config = {
-  sass:'./src/sass/*.scss',
-  css:'./styles',
-  js:'./src/js',
-  jsmin:'./js',
-  images:'./images/*.{png,gif,jpeg,jpg,svg}',
-  imagesmin:'./images/minified'
-};
-
-
-var AUTOPREFIXER_BROWSERS = [
-  '> 1%',
-  'ie >= 8',
-  'ie_mob >= 10',
-  'ff >= 30',
-  'chrome >= 34',
-  'safari >= 7',
-  'opera >= 23',
-  'ios >= 7',
-  'android >= 4',
-  'bb >= 10'
-];
-
-
 var onError =function(err) {
   console.log(err.toString());
   this.emit('end');
 };
 
+var theme_dir = config.drupal.root + '/' + config.drupal.themes + '/' + config.drupal.theme_name + '/';
+
+var settings = {
+  sass_src: [theme_dir + config.sass.src + "/*.sass", theme_dir + config.sass.src + "/**/*.sass"],
+  sass_dest: theme_dir + config.sass.dest,
+  js_src: theme_dir + config.javascript.src + '/*.js',
+  js_dest: theme_dir + config.javascript.dest,
+  img_src: theme_dir + config.images.src + '/' + config.images.extensions,
+  img_dest: theme_dir + config.images.dest
+};
+
+//console.log(settings.sass_src);
 
 gulp.task('styles',function() {
-  return gulp.src(config.sass)
+  return gulp.src(settings.sass_src)
     .pipe(plumber({
       errorHandler: onError
     }))
     .pipe(sass({
-      style:'expanded',
+      style:'compressed',
       compass:true,
       precision:10
     }))
-    .pipe(gcmq())
-    .pipe(autoprefixer({
-      browsers: AUTOPREFIXER_BROWSERS,
-      cascade:false
-    }))
-    .pipe(csscomb())
-    .pipe(gulp.dest(config.css))
-    .pipe(minifyCSS())
-    .pipe(rename({suffix:".min"}))
-    .pipe(bless())
-    .pipe(gulp.dest(config.css))
+    .pipe(gulp.dest(settings.sass_dest))
     .pipe(size({title:'css'}));
 });
 
 
 gulp.task('scripts',function() {
-  return gulp.src(config.js +'/**/*.js')
+  return gulp.src(settings.js_src)
     .pipe(plumber({
       errorHandler: onError
     }))
     .pipe(jshint())
     .pipe(jshint.reporter('jshint-stylish'))
     .pipe(concat('main.js'))
-    .pipe(gulp.dest(config.jsmin))
+    .pipe(gulp.dest(settings.js_dest))
     .pipe(rename({suffix:".min"}))
     .pipe(uglify())
-    .pipe(gulp.dest(config.jsmin))
+    .pipe(gulp.dest(settings.js_dest))
   .pipe(size({title:'js'}));
 });
 
 
 gulp.task('images',function() {
-  return gulp.src(config.images)
+  return gulp.src(settings.img_src)
     .pipe(plumber({
       errorHandler: onError
     }))
     .pipe(imagemin({
       optimizationLevel:7,
       progressive:true,
-      interlaced:true,
+      interlaced:true
     }))
-    .pipe(gulp.dest(config.imagesmin))
+    .pipe(gulp.dest(settings.img_dest))
     .pipe(size({title:'images'}));
 });
 
 
-gulp.task('drush', shell.task([
-  'drush cache-clear theme-registry'
-]));
+//gulp.task('drush', shell.task([
+//  'drush '+ config.drupal.drush_alias +' cache-clear theme-registry'
+//]));
 
 
 gulp.task('default',[],function() {
@@ -116,8 +90,9 @@ gulp.task('default',[],function() {
 
 
 gulp.task('watch',[],function() {
-  gulp.watch(config.js,['scripts']);
-  gulp.watch(config.sass,['styles']);
-  gulp.watch(config.images,['images']);
-  gulp.watch('**/*.{php,inc,info}',['drush']);
+  gulp.start('default');
+  gulp.watch(settings.js_src,['scripts']);
+  gulp.watch(settings.sass_src,['styles']);
+  gulp.watch(settings.img_src,['images']);
+  //gulp.watch('**/*.{php,inc,info}',['drush']);
 });

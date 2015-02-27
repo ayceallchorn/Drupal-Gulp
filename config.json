@@ -1,0 +1,21 @@
+{
+  "drupal": {
+    "root": ".././docroot",
+    "themes": "sites/all/themes",
+    "theme_name": "THEME",
+    "drush_alias": "@THEME"
+  },
+  "sass": {
+    "src": "src/sass",
+    "dest": "css"
+  },
+  "javascript": {
+    "src": "src/js",
+    "dest": "js"
+  },
+  "images": {
+    "extensions": "png,gif,jpeg,jpg,svg",
+    "src": "src/images",
+    "dest": "img"
+  }
+}
