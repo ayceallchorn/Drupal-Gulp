@@ -31,8 +31,6 @@ var settings = {
   img_dest: theme_dir + config.images.dest
 };
 
-//console.log(settings.sass_src);
-
 gulp.task('styles',function() {
   return gulp.src(settings.sass_src)
     .pipe(plumber({
@@ -78,12 +76,6 @@ gulp.task('images',function() {
     .pipe(size({title:'images'}));
 });
 
-
-//gulp.task('drush', shell.task([
-//  'drush '+ config.drupal.drush_alias +' cache-clear theme-registry'
-//]));
-
-
 gulp.task('default',[],function() {
   gulp.start('styles','scripts','images');
 });
@@ -94,5 +86,4 @@ gulp.task('watch',[],function() {
   gulp.watch(settings.js_src,['scripts']);
   gulp.watch(settings.sass_src,['styles']);
   gulp.watch(settings.img_src,['images']);
-  //gulp.watch('**/*.{php,inc,info}',['drush']);
 });
