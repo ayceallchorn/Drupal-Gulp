@@ -23,7 +23,7 @@ var onError =function(err) {
 var theme_dir = config.drupal.root + '/' + config.drupal.themes + '/' + config.drupal.theme_name + '/';
 
 var settings = {
-  sass_src: [theme_dir + config.sass.src + "/*.sass", theme_dir + config.sass.src + "/**/*.sass"],
+  sass_src: [theme_dir + config.sass.src + "/*.sass", theme_dir + config.sass.src + "/**/*.sass", theme_dir + config.sass.src + "/*.scss", theme_dir + config.sass.src + "/**/*.scss"],
   sass_dest: theme_dir + config.sass.dest,
   js_src: theme_dir + config.javascript.src + '/*.js',
   js_dest: theme_dir + config.javascript.dest,
